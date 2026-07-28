@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Airflow
+logs/
+
+# SQLite
+*.db
+
+# Environment variables
+.env
+
+# IDEs
+.vscode/
+.idea/
