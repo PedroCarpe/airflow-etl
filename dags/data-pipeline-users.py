@@ -28,7 +28,8 @@ dag = DAG(
 
 # Database setup function
 def setup_database():
-    db_path = os.path.join(os.path.dirname(__file__), 'etl_data.db')
+    BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+    db_path = os.path.join(BASE_DIR,'data','output','etl_data.db')
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
@@ -53,9 +54,14 @@ def setup_database():
 # Define the extract function
 def extract_data():
     print("Extracting data from users.csv...")
-    csv_path = os.path.join(os.path.dirname(__file__), 'users.csv')
+
+    BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
+    csv_path = os.path.join(BASE_DIR, "data", "input", "users.csv")
+    print(f"CSV PATH: {csv_path}")
+
     df = pd.read_csv(csv_path)
-    return df.to_dict('records')
+    return df.to_dict("records")
 
 # Define the transform function
 def transform_data(**context):
@@ -74,7 +80,9 @@ def load_data(**context):
     data = context['task_instance'].xcom_pull(task_ids='transform')
     
     # Connect to database
-    db_path = os.path.join(os.path.dirname(__file__), 'etl_data.db')
+    BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+    db_path = os.path.join(BASE_DIR,'data','output','etl_data.db')
+
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     

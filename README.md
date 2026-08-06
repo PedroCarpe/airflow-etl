@@ -56,10 +56,11 @@ The workflow is managed by an Airflow DAG with the following tasks:
 .
 ├── dags/
 │   └── data-pipeline-users.py
-     └──
-     └──
-├── users.csv
-├── etl_data.db
+├──data
+│   ├── input
+│   │   └── users.csv
+│   └── output
+│       └── etl_data.db
 ├── docker-compose.yml
 ├── .env
 ├── logs/
