@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.operators.empty import EmptyOperator
+from airflow.hooks.base import BaseHook
+from airflow.providers.postgres.hooks.postgres import PostgresHook
 import sqlite3
 import os
 import pandas as pd
@@ -25,6 +27,67 @@ dag = DAG(
     start_date=datetime(2025, 4, 22),
     catchup=False,
 )
+
+# Postgres setup function
+def setup_postgres():
+    conn = BaseHook.get_connection("my_postgres")
+
+    host = conn.host
+    user = conn.login
+    password = conn.password
+    database = conn.schema
+
+
+
+def load_data_postgres(**context):
+    print("Loading data to PostgreSQL...")
+
+    # Get transformed data from previous task
+    data = context['task_instance'].xcom_pull(task_ids='transform')
+
+    # Connect to PostgreSQL using the Airflow connection
+    postgres_hook = PostgresHook(postgres_conn_id="my_postgres")
+
+
+    # Insert data
+    insert_sql = """
+        INSERT INTO users (
+            id,
+            first_name,
+            last_name,
+            email,
+            gender,
+            ip_address
+        )
+        VALUES (%s, %s, %s, %s, %s, %s)
+    """
+
+    records = [
+        (
+            record['id'],
+            record['first_name'],
+            record['last_name'],
+            record['email'],
+            record['gender'],
+            record['ip_address']
+        )
+        for record in data
+    ]
+
+    postgres_hook.insert_rows(
+        table="users",
+        rows=records,
+        target_fields=[
+            "id",
+            "first_name",
+            "last_name",
+            "email",
+            "gender",
+            "ip_address"
+        ]
+    )
+
+    print(f"Successfully loaded {len(records)} user records into PostgreSQL")    
 
 # Database setup function
 def setup_database():
@@ -122,7 +185,7 @@ transform_task = PythonOperator(
 
 load_task = PythonOperator(
     task_id='load',
-    python_callable=load_data,
+    python_callable=load_data_postgres,
     provide_context=True,
     dag=dag,
 )
@@ -136,5 +199,14 @@ setup_db_task = PythonOperator(
     dag=dag,
 )
 
+# Add database setup task for Postgres
+setup_postgres_task = PythonOperator(
+    task_id='setup_postgres',
+    python_callable=setup_postgres,
+    dag=dag,
+)
+
 # Define the task dependencies
-start_task >> setup_db_task >> extract_task >> transform_task >> load_task >> end_task
+#start_task >> setup_postgres_task
+#start_task >> setup_db_task >> extract_task >> transform_task >> load_task >> end_task
+start_task >> extract_task >> transform_task >> load_task >> end_task
