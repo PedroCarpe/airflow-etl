@@ -37,6 +37,7 @@ The workflow is managed by an Airflow DAG with the following tasks:
 
 
 ![Alt text](./images/architecture.jpeg)
+
 ---
 
 ## Technologies
@@ -47,8 +48,13 @@ The workflow is managed by an Airflow DAG with the following tasks:
 | Python         | ETL implementation                    |
 | Pandas         | CSV processing                        |
 | SQLite         | Lightweight relational database       |
+| Postgres       | Relational database                   |
+| pgAdmin        | Postgres' client                      |
 | Docker         | Containerization                      |
 | Docker Compose | Multi-container orchestration         |
+| Jira           | Project management                    |
+
+![Alt text](./images/tech_stack.png)
 
 ---
 
