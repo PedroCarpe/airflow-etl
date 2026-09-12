@@ -35,6 +35,8 @@ The workflow is managed by an Airflow DAG with the following tasks:
 5. **Load Data**
 6. **End**
 
+
+![Alt text](./images/architecture.jpeg)
 ---
 
 ## Technologies
