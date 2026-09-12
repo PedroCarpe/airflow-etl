@@ -157,6 +157,8 @@ Default credentials (if unchanged):
 * Username: `airflow`
 * Password: `airflow`
 
+![Alt text](./images/airflow.png)
+
 ---
 
 ## Database Schema
